@@ -55,7 +55,9 @@ func MakeSteps(length int) *map[int]*Step {
 		stps[i] = &Step{
 			Number: i,
 			Active: false,
-			Trig:   &Trigger{},
+			Trig: &Trigger{
+				Note: int32(i + 50),
+			},
 		}
 	}
 
@@ -137,7 +139,7 @@ func (s *Sequencer) ProcessAudio(out []float32) {
 // Triggers a playback by resetting the playhead for the matching tracks.
 func (s *Sequencer) PlayTrigger(stp *Step) {
 	fmt.Println("Step:", stp.Number, "Trig note:", stp.Trig.Note)
-	//oscControl()
+	oscControl(stp.Trigger.Note)
 	return
 }
 

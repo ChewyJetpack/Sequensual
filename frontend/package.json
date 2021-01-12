@@ -1,6 +1,6 @@
 {
-  "name": "sequensual",
-  "author": "chewy<chewyjetpack@gmail.com>",
+  "name": "traintracs",
+  "author": "Emil Smith<hi@emilsmith.pro>",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

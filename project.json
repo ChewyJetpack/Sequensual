@@ -1,9 +1,9 @@
 {
- "name": "TRAINTRACS",
+ "name": "traintracs",
  "description": "Make tracks on trains",
  "author": {
   "name": "Emil Smith",
-  "email": "emilsmith@mailbox.org"
+  "email": "hi@emilsmith.pro"
  },
  "version": "0.1.0",
  "binaryname": "traintracs",

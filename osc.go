@@ -7,8 +7,8 @@ import (
 	"github.com/hypebeast/go-osc/osc"
 )
 
-func oscControl() {
-	client := osc.NewClient("localhost", 24024)
+func oscControl(note int32, length) {
+	client := osc.NewClient("elk-pi.local", 24024)
 	noteOn := osc.NewMessage("/keyboard_event/main", string("note_on"), int32(0), int32(50), float32(1))
 	noteOff := osc.NewMessage("/keyboard_event/main", string("note_off"), int32(0), int32(50), float32(1))
 	client.Send(noteOn)
