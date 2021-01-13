@@ -15,11 +15,6 @@ func main() {
 		return
 	}
 
-	wailsInit(s)
-}
-
-func wailsInit(s *Sequencer) {
-
 	js := mewn.String("./frontend/dist/app.js")
 	css := mewn.String("./frontend/dist/app.css")
 
@@ -36,4 +31,17 @@ func wailsInit(s *Sequencer) {
 	app.Bind(s)
 
 	app.Run()
+}
+
+func (s *Sequencer) wailsInit(runtime *wails.Runtime) {
+
+	runtime.Events.On("play", func(...interface{}) {
+		s.Start()
+	})
+
+	runtime.Events.On("toggleStep", func(data ...interface{}) {
+		fmt.Println(data[0])
+		s.SetStep(1, true)
+		runtime.Events.Emit("updateSteps", s.Steps)
+	})
 }

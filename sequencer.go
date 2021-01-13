@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"sync"
-)
 
-var wg = sync.WaitGroup{}
+	"github.com/hypebeast/go-osc/osc"
+)
 
 // Sequencer describes the mechanism that
 // Triggers and synchronizses a Pattern for audio playback.
@@ -15,6 +14,7 @@ type Sequencer struct {
 	Channel int
 	Steps   *map[int]*Step
 	Length  int
+	Osc     *osc.Client
 }
 
 type Step struct {
@@ -41,6 +41,7 @@ func NewSequencer(length, channel int, tempo float32) (*Sequencer, error) {
 		Channel: channel,
 		Steps:   MakeSteps(length),
 		Length:  length,
+		Osc:     osc.NewClient("elk-pi.local", 24024),
 	}
 
 	return s, nil
@@ -68,9 +69,6 @@ func MakeSteps(length int) *map[int]*Step {
 // Starts counting the Pulses Per Quarter note for the given BPM.
 // Triggers samples based on each 16th note that is triggered.
 func (s *Sequencer) Start() {
-
-	// TODO: wg currently not working - is this needed?
-	wg.Add(1)
 
 	go func() {
 		ppqnCount := 0
@@ -101,16 +99,14 @@ func (s *Sequencer) Start() {
 	}()
 
 	go s.Timer.Start()
-
-	// TODO: wg currently not working - is this needed?
-	wg.Wait()
 }
 
 func activeStep(stp *Step, s *Sequencer) {
 	stp.Active = true
 
 	if stp.Trig.Active {
-		go s.PlayTrigger(stp)
+		fmt.Println("Step:", stp.Number, "Trig note:", stp.Trig.Note)
+		go oscNote(stp.Trig.Note, 1, s.Osc)
 	} else {
 		fmt.Println("Step:", stp.Number, "No Trig.")
 	}
@@ -135,14 +131,6 @@ func (s *Sequencer) ProcessAudio(out []float32) {
 	}
 }
 
-// PlayTrigger triggers a playback for any track that is active for the passed in index.
-// Triggers a playback by resetting the playhead for the matching tracks.
-func (s *Sequencer) PlayTrigger(stp *Step) {
-	fmt.Println("Step:", stp.Number, "Trig note:", stp.Trig.Note)
-	oscControl(stp.Trigger.Note)
-	return
-}
-
 // Stop is a placeholder method for a stop button
 func (s *Sequencer) Stop() {
 	fmt.Printf("I wish it would stop now lol")
@@ -158,7 +146,7 @@ func (s *Sequencer) GetSteps() *map[int]*Step {
 	return s.Steps
 }
 
-// SetStep is a setter that can be called by the front end
+// SetStep is a setter that can be called in response to the 'toggleStep' event from the front end
 func (s *Sequencer) SetStep(n int, a bool) {
 	(*s.Steps)[n].Trig.Active = a
 }

@@ -9,7 +9,6 @@
         v-for="step in steps"
         :key="step.Number"
         :step="step"
-        :callback="getSteps"
         />
     </div>
   </div>
@@ -27,6 +26,15 @@ export default {
       steps: this.getSteps()
     }
   },
+  mounted() {
+    console.log(window)
+    window.wails.Events.On('updateSteps', steps => {
+      console.log('steps:', steps)
+      if (steps) {
+        this.steps = steps;
+      }
+    })
+  },
   methods: {
     getSteps() {
       window.backend.Sequencer.GetSteps().then(result => {
@@ -34,11 +42,12 @@ export default {
       });
     },
     play() {
-      window.backend.Sequencer.Start();
+      window.wails.Events.Emit('play')
     },
     stop() {
-      window.backend.Sequencer.Stop();
+      window.wails.Events.Emit('stop')
     }
+    
   }
 };
 </script>

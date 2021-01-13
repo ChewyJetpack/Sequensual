@@ -1,6 +1,6 @@
 <template>
     <div :class="['step', { 'step--active-trig': step.Trig.Active }]">
-        <div :class="[ 'step-indicator', { 'step-indicator--set': step.Trig.Active }]" @click="toggleStep()" />
+        <div :class="[ 'step-indicator', { 'step-indicator--set': step.Trig.Active }]" @click="toggleStep" />
         {{ step.Number + 1 }}
     </div>
 </template>
@@ -20,7 +20,8 @@ export default {
             const stepNumber = this.step.Number;
             let trigStatus = this.step.Trig.Active;
             trigStatus ? trigStatus = false : trigStatus = true;
-            window.backend.Sequencer.SetStep(stepNumber, trigStatus).then(this.callback());
+            window.wails.Events.Emit("toggleStep", { number: stepNumber, status: trigStatus });
+            console.log('step toggled:', { number: stepNumber, status: trigStatus })
         }
     }
 }
