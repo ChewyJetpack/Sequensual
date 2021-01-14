@@ -42,10 +42,10 @@ export default {
       });
     },
     play() {
-      window.wails.Events.Emit('play')
+      window.wails.Events.Emit("play")
     },
     stop() {
-      window.wails.Events.Emit('stop')
+      window.wails.Events.Emit("stop")
     }
     
   }

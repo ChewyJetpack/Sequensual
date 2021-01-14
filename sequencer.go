@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hypebeast/go-osc/osc"
+	"github.com/wailsapp/wails"
 )
 
 // Sequencer describes the mechanism that
@@ -15,6 +16,7 @@ type Sequencer struct {
 	Steps   *map[int]*Step
 	Length  int
 	Osc     *osc.Client
+	Log     *wails.CustomLogger
 }
 
 type Step struct {
@@ -147,6 +149,6 @@ func (s *Sequencer) GetSteps() *map[int]*Step {
 }
 
 // SetStep is a setter that can be called in response to the 'toggleStep' event from the front end
-func (s *Sequencer) SetStep(n int, a bool) {
-	(*s.Steps)[n].Trig.Active = a
+func (s *Sequencer) SetStep(st Step) {
+	(*s.Steps)[st.Number] = &st
 }

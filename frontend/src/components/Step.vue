@@ -20,7 +20,7 @@ export default {
             const stepNumber = this.step.Number;
             let trigStatus = this.step.Trig.Active;
             trigStatus = !trigStatus;
-            window.wails.Events.Emit("toggleStep", [stepNumber, trigStatus]);
+            window.wails.Events.Emit("changeStep", {stepNumber, trigStatus});
             console.log('step toggled:', { number: stepNumber, status: trigStatus })
         }
     }
