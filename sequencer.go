@@ -11,6 +11,7 @@ import (
 // Triggers and synchronizses a Pattern for audio playback.
 type Sequencer struct {
 	Timer   *Timer
+	Running bool
 	Beat    int
 	Channel int
 	Steps   *map[int]*Step
@@ -39,6 +40,7 @@ func NewSequencer(length, channel int, tempo float32) (*Sequencer, error) {
 
 	s := &Sequencer{
 		Timer:   NewTimer(tempo),
+		Running: false,
 		Beat:    0,
 		Channel: channel,
 		Steps:   MakeSteps(length),
@@ -71,6 +73,7 @@ func MakeSteps(length int) *map[int]*Step {
 // Starts counting the Pulses Per Quarter note for the given BPM.
 // Triggers samples based on each 16th note that is triggered.
 func (s *Sequencer) Start() {
+	s.Running = true
 
 	go func() {
 		ppqnCount := 0
@@ -78,6 +81,12 @@ func (s *Sequencer) Start() {
 		for {
 			select {
 			case <-s.Timer.Pulses:
+				if !s.Running {
+					ppqnCount = 0
+					s.Beat = 0
+					s.Timer.Done <- true
+					break
+				}
 				ppqnCount++
 
 				// Trigger playback after 6 pulses, which is 16th note precision
@@ -91,9 +100,6 @@ func (s *Sequencer) Start() {
 				if ppqnCount == (int(Ppqn) * 4) {
 					ppqnCount = 0
 					s.Beat = 0
-
-					// TODO: move this, as it currently prevents last step from activating
-					//wg.Done()
 				}
 
 			}
@@ -103,12 +109,19 @@ func (s *Sequencer) Start() {
 	go s.Timer.Start()
 }
 
+func (s *Sequencer) Stop() {
+	s.Running = false
+}
+
 func activeStep(stp *Step, s *Sequencer) {
 	stp.Active = true
 
+	wailsRuntime.Events.Emit("activeStep", stp.Number)
+
 	if stp.Trig.Active {
 		fmt.Println("Step:", stp.Number, "Trig note:", stp.Trig.Note)
-		go oscNote(stp.Trig.Note, 1, s.Osc)
+		// commented out for pi-free development
+		//go oscNote(stp.Trig.Note, 1, s.Osc)
 	} else {
 		fmt.Println("Step:", stp.Number, "No Trig.")
 	}
@@ -131,11 +144,6 @@ func (s *Sequencer) ProcessAudio(out []float32) {
 
 		out[i] = data
 	}
-}
-
-// Stop is a placeholder method for a stop button
-func (s *Sequencer) Stop() {
-	fmt.Printf("I wish it would stop now lol")
 }
 
 // GetLength is a utility method for the front end, to get the length of the sequence

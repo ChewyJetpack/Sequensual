@@ -1,6 +1,6 @@
 <template>
-    <div :class="['step', { 'step--active-trig': step.Trig.Active }]">
-        <div :class="[ 'step-indicator', { 'step-indicator--set': step.Trig.Active }]" @click="toggleStep" />
+    <div class="step">
+        <div :class="[ 'step-indicator', { 'step-indicator--set': step.Trig.Active, 'step-indicator--active': step.Active }]" @click="toggleStep" />
         {{ step.Number + 1 }}
     </div>
 </template>
@@ -14,6 +14,15 @@ export default {
         callback: {
             type: Function
         }
+    },
+    mounted() {
+        window.wails.Events.On("activeStep", stepNumber => {
+            if (this.step.Number == stepNumber) {
+                this.step.Active = true;
+            } else {
+                this.step.Active = false;
+            }
+        })
     },
     methods: {
         toggleStep() {
@@ -40,6 +49,10 @@ export default {
     border-radius: 50%;
     margin-bottom: 10px;
     cursor: pointer;
+}
+
+.step-indicator--active {
+    background: orange;
 }
 
 .step-indicator--set {

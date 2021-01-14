@@ -7,6 +7,8 @@ import (
 	"github.com/wailsapp/wails"
 )
 
+var wailsRuntime *wails.Runtime
+
 func main() {
 
 	s, err := NewSequencer(16, 0, 140.0)
@@ -35,9 +37,14 @@ func main() {
 
 func (s *Sequencer) WailsInit(runtime *wails.Runtime) error {
 	s.Log = runtime.Log.New("Sequencer")
+	wailsRuntime = runtime
 
 	runtime.Events.On("play", func(...interface{}) {
 		s.Start()
+	})
+
+	runtime.Events.On("stop", func(...interface{}) {
+		s.Stop()
 	})
 
 	runtime.Events.On("changeStep", func(data ...interface{}) {
