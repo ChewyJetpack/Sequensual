@@ -33,15 +33,18 @@ func main() {
 	app.Run()
 }
 
-func (s *Sequencer) wailsInit(runtime *wails.Runtime) {
+func (s *Sequencer) wailsInit(runtime *wails.Runtime) error {
 
 	runtime.Events.On("play", func(...interface{}) {
 		s.Start()
 	})
 
-	runtime.Events.On("toggleStep", func(data ...interface{}) {
-		fmt.Println(data[0])
-		s.SetStep(1, true)
+	runtime.Events.On("toggleStep", func(...interface{}) {
+		// newData := data[0].([]map[string]string)
+		//fmt.Println(data)
+		// s.SetStep(1, true)
 		runtime.Events.Emit("updateSteps", s.Steps)
 	})
+
+	return nil
 }

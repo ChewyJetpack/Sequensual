@@ -41,7 +41,7 @@ func NewSequencer(length, channel int, tempo float32) (*Sequencer, error) {
 		Channel: channel,
 		Steps:   MakeSteps(length),
 		Length:  length,
-		Osc:     osc.NewClient("elk-pi.local", 24024),
+		//Osc:     osc.NewClient("elk-pi.local", 24024),
 	}
 
 	return s, nil

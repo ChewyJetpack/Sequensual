@@ -28,8 +28,8 @@ export default {
   },
   mounted() {
     console.log(window)
-    window.wails.Events.On('updateSteps', steps => {
-      console.log('steps:', steps)
+    window.wails.Events.On("updateSteps", steps => {
+      console.log(steps)
       if (steps) {
         this.steps = steps;
       }
