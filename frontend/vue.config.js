@@ -1,4 +1,9 @@
-let cssConfig = {};
+let cssConfig = {
+  loaderOptions: {
+    scss: {
+    }
+  }
+};
 
 if (process.env.NODE_ENV == "production") {
   cssConfig = {

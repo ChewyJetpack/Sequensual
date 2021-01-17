@@ -35,6 +35,7 @@ func main() {
 	app.Run()
 }
 
+// WailsInit instantiates the wails runtime and contains event listeners for the js app
 func (s *Sequencer) WailsInit(runtime *wails.Runtime) error {
 	s.Log = runtime.Log.New("Sequencer")
 	wailsRuntime = runtime

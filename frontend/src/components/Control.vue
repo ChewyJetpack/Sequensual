@@ -23,17 +23,24 @@ export default {
   },
   data() {
     return {
-      steps: this.getSteps()
+      steps: this.getSteps(),
+      running: false
     }
   },
   mounted() {
     console.log(window)
+
     window.wails.Events.On("updateSteps", steps => {
       console.log(steps)
       if (steps) {
         this.steps = steps;
       }
     })
+
+    window.wails.Events.On("running", running => {
+      this.running = running;
+    })
+
   },
   methods: {
     getSteps() {
@@ -42,10 +49,14 @@ export default {
       });
     },
     play() {
-      window.wails.Events.Emit("play")
+      if (!this.running) {
+        window.wails.Events.Emit("play")
+      }
     },
     stop() {
-      window.wails.Events.Emit("stop")
+      if (this.running) {
+        window.wails.Events.Emit("stop")
+      }
     }
     
   }
@@ -94,8 +105,8 @@ a {
 .steps {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(16, 1fr);
-  grid-gap: 10px;
+  grid-template-columns: repeat(8, 1fr);
+  grid-gap: 16px;
   padding-top:40px;
 }
 </style>

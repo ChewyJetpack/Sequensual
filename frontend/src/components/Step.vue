@@ -1,7 +1,24 @@
 <template>
     <div class="step">
-        <div :class="[ 'step-indicator', { 'step-indicator--set': step.Trig.Active, 'step-indicator--active': step.Active }]" @click="toggleStep" />
+        <div :class="[ 'step__indicator', { 'step__indicator--set': step.Trig.Active, 'step__indicator--active': step.Active }]" @click="toggleStep" />
         {{ step.Number + 1 }}
+        <div class="step__controls">
+            <div>Pitch:</div>
+            <el-knob
+                :value="pitch.value"
+                :options="pitchKnobOpts"
+                @input="changePitch($event.value)"
+                size="xs"
+            />
+            <div>Octave:</div>
+            <el-knob
+                :value="pitch.octave"
+                :options="[0, 1, 2, 3, 4, 5]"
+                @input="changeOct($event.value)"
+                size="xs"
+            />
+
+        </div>
     </div>
 </template>
 
@@ -13,6 +30,43 @@ export default {
         },
         callback: {
             type: Function
+        }
+    },
+    data() {
+        return {
+            notes: [
+                "C",
+                "C#",
+                "D",
+                "D#",
+                "E",
+                "F",
+                "F#",
+                "G",
+                "G#",
+                "A",
+                "Bb",
+                "B"
+            ],
+            pitch: {
+                // '24' is the int value for C1 in MIDI
+                value: 24,
+                note: "C1",
+                octave: 1
+            }
+        }
+    },
+    computed: {
+        pitchKnobOpts() {
+            let noteArr = [];
+            for (let i = 0; i < this.notes.length; i++) {
+                let opt = {
+                    value: i + 24,
+                    label: this.notes[i]
+                }
+                noteArr.push(opt)
+            }
+            return noteArr;
         }
     },
     mounted() {
@@ -31,31 +85,41 @@ export default {
             trigStatus = !trigStatus;
             window.wails.Events.Emit("changeStep", {stepNumber, trigStatus});
             console.log('step toggled:', { number: stepNumber, status: trigStatus })
+        },
+        changePitch(val) {
+            this.pitch.value = val;
+        },
+        changeOct(val) {
+            this.pitch.octave = val;
+        },
+        sendTrig() {
+            
         }
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .step {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-.step-indicator {
-    height: 20px;
-    width: 20px;
-    background: crimson;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
+    
+    &__indicator {
+        height: 48px;
+        width: 48px;
+        background: crimson;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        cursor: pointer;
 
-.step-indicator--active {
-    background: orange;
-}
+        &--active {
+            background: orange;
+        }
 
-.step-indicator--set {
-    background: yellowgreen;
+        &--set {
+            background: yellowgreen;
+        }
+    }
 }
 </style>

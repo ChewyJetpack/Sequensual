@@ -20,12 +20,14 @@ type Sequencer struct {
 	Log     *wails.CustomLogger
 }
 
+// Step contains all the data needed for a single sequencer step, aside from the trig
 type Step struct {
 	Number int
 	Active bool
 	Trig   *Trigger
 }
 
+// Trigger - an active component of a step that contains any relevant notation or other data to be sent to a device
 type Trigger struct {
 	Note     int32
 	Velocity float32
@@ -74,6 +76,7 @@ func MakeSteps(length int) *map[int]*Step {
 // Triggers samples based on each 16th note that is triggered.
 func (s *Sequencer) Start() {
 	s.Running = true
+	wailsRuntime.Events.Emit("running", s.Running)
 
 	go func() {
 		ppqnCount := 0
@@ -84,7 +87,7 @@ func (s *Sequencer) Start() {
 				if !s.Running {
 					ppqnCount = 0
 					s.Beat = 0
-					s.Timer.Done <- true
+					//s.Timer.Done <- true
 					break
 				}
 				ppqnCount++
@@ -109,10 +112,13 @@ func (s *Sequencer) Start() {
 	go s.Timer.Start()
 }
 
+// Stop stops the sequencer Start() loop
 func (s *Sequencer) Stop() {
 	s.Running = false
+	wailsRuntime.Events.Emit("running", s.Running)
 }
 
+// activeStep sets the current step as active, emits data to the front end, and executes the step trig
 func activeStep(stp *Step, s *Sequencer) {
 	stp.Active = true
 
@@ -128,22 +134,6 @@ func activeStep(stp *Step, s *Sequencer) {
 
 	s.Beat++
 	stp.Active = false
-}
-
-// ProcessAudio is the callback function for the portaudio stream
-// Attached the the current Sequencer.
-// Writes all active Track Samples to the output buffer
-// At the playhead for each track.
-func (s *Sequencer) ProcessAudio(out []float32) {
-	for i := range out {
-		var data float32
-
-		if data > 1.0 {
-			data = 1.0
-		}
-
-		out[i] = data
-	}
 }
 
 // GetLength is a utility method for the front end, to get the length of the sequence
