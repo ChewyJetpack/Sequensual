@@ -51,20 +51,29 @@ func (s *Sequencer) WailsInit(runtime *wails.Runtime) error {
 	runtime.Events.On("changeStep", func(data ...interface{}) {
 
 		newStep := Step{
+			Number: 0,
 			Active: false,
 			Trig: &Trigger{
-				Note: int32(50),
+				Note:     0,
+				Velocity: 100,
+				Length:   1,
+				Active:   false,
 			},
 		}
 		for k, v := range data[0].(map[string]interface{}) {
-			if k == "stepNumber" {
+			switch k {
+			case "number":
 				newStep.Number = int(v.(float64))
-			} else if k == "trigStatus" {
+			case "status":
 				newStep.Trig.Active = v.(bool)
+			case "note":
+				newStep.Trig.Note = int32(v.(float64))
+				// case "length":
+				// case "velocity":
 			}
 		}
 		s.SetStep(newStep)
-		fmt.Println(newStep)
+		fmt.Println(newStep.Trig)
 		runtime.Events.Emit("updateSteps", s.Steps)
 	})
 

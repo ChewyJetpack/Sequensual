@@ -47,7 +47,7 @@ func NewSequencer(length, channel int, tempo float32) (*Sequencer, error) {
 		Channel: channel,
 		Steps:   MakeSteps(length),
 		Length:  length,
-		//Osc:     osc.NewClient("elk-pi.local", 24024),
+		Osc:     osc.NewClient("elk-pi.local", 24024),
 	}
 
 	return s, nil
@@ -125,9 +125,9 @@ func activeStep(stp *Step, s *Sequencer) {
 	wailsRuntime.Events.Emit("activeStep", stp.Number)
 
 	if stp.Trig.Active {
-		fmt.Println("Step:", stp.Number, "Trig note:", stp.Trig.Note)
+		fmt.Println("Step:", stp.Number, "Trig note:", stp.Trig.Note, "Client:", s.Osc)
 		// commented out for pi-free development
-		//go oscNote(stp.Trig.Note, 1, s.Osc)
+		go oscNote(stp.Trig.Note, 1, s.Osc)
 	} else {
 		fmt.Println("Step:", stp.Number, "No Trig.")
 	}
@@ -149,4 +149,5 @@ func (s *Sequencer) GetSteps() *map[int]*Step {
 // SetStep is a setter that can be called in response to the 'toggleStep' event from the front end
 func (s *Sequencer) SetStep(st Step) {
 	(*s.Steps)[st.Number] = &st
+	fmt.Println((*s.Steps)[st.Number])
 }

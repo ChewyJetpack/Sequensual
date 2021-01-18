@@ -14,7 +14,7 @@
             <el-knob
                 :value="pitch.octave"
                 :options="[0, 1, 2, 3, 4, 5]"
-                @input="changeOct($event.value)"
+                @input="changeOct($event)"
                 size="xs"
             />
 
@@ -80,20 +80,26 @@ export default {
     },
     methods: {
         toggleStep() {
-            const stepNumber = this.step.Number;
-            let trigStatus = this.step.Trig.Active;
-            trigStatus = !trigStatus;
-            window.wails.Events.Emit("changeStep", {stepNumber, trigStatus});
-            console.log('step toggled:', { number: stepNumber, status: trigStatus })
+            this.step.Trig.Active = !this.step.Trig.Active;
+            this.changeStep()
+        },
+        changeStep() {
+            const number = this.step.Number;
+            let status = this.step.Trig.Active;
+            let note = this.pitch.value * this.pitch.octave;
+            console.log(note)
+            let velocity = 100;
+            let length = 1;
+
+            window.wails.Events.Emit("changeStep", {number, status, note, length, velocity});
         },
         changePitch(val) {
             this.pitch.value = val;
+            this.changeStep()
         },
         changeOct(val) {
             this.pitch.octave = val;
-        },
-        sendTrig() {
-            
+            this.changeStep()
         }
     }
 }
