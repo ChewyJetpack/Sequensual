@@ -1,6 +1,6 @@
 package main
 
-// Ppqn - Pulses Per Quarter Note.  A synchronization primative used in music technology.
+// Ppqn - Pulses Per Quarter Note.  A synchronization primitive used in music technology.
 var Ppqn = 24.0
 
 // Minute - The number of seconds in a Minute as a float.
